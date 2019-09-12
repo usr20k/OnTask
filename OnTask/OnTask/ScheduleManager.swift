@@ -67,6 +67,8 @@ class ScheduleManager {
         
         userPrefs = readPrefs();
         
+        insertEvent(store: store!)
+        
         print("DEBUG: Calendar type:", userCalendar.identifier);
         //print(store?.defaultCalendarForNewEvents?.title);
         print("DEBUG: FirstBoot:", userPrefs!.FirstBoot);
@@ -98,6 +100,37 @@ class ScheduleManager {
     
     func getStore() -> EKEventStore {
         return store!;
+    }
+    
+    //Test function to creata an event and add it to the calendar
+    func insertEvent(store: EKEventStore) {
+        // 1
+        let calendars = store.calendars(for: .event)
+        
+        for calendar in calendars {
+            // 2
+            if calendar.title == "Home" {
+                // 3
+                let startDate = Date()
+                // 2 hours
+                let endDate = startDate.addingTimeInterval(2 * 60 * 60)
+                
+                // 4
+                let event = EKEvent(eventStore: store)
+                event.calendar = calendar
+                
+                event.title = "New Meeting"
+                event.startDate = startDate
+                event.endDate = endDate
+                
+                // 5
+                do {
+                    try store.save(event, span: .thisEvent)
+                }
+                catch {
+                    print("Error saving event in calendar")             }
+            }
+        }
     }
     
     //Fields:
